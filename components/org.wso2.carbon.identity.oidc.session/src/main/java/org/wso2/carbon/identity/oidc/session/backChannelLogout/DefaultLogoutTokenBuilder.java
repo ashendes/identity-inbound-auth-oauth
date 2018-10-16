@@ -67,9 +67,7 @@ public class DefaultLogoutTokenBuilder implements LogoutTokenBuilder {
     public static final Log log = LogFactory.getLog(DefaultLogoutTokenBuilder.class);
     private OAuthServerConfiguration config = null;
     private JWSAlgorithm signatureAlgorithm = null;
-    private static final String OPENID_IDP_ENTITY_ID = "IdPEntityId";
-    private static final String ERROR_GET_RESIDENT_IDP =
-            "Error while getting Resident Identity Provider of '%s' tenant.";
+
 
     public DefaultLogoutTokenBuilder() throws IdentityOAuth2Exception {
 
@@ -83,24 +81,24 @@ public class DefaultLogoutTokenBuilder implements LogoutTokenBuilder {
 
         Map<String, String> logoutTokenList = new HashMap<>();
         // Send logout token to all RPs.
-        OIDCSessionState sessionState = getSessionState(request);
+        OIDCSessionState sessionState = OIDCSessionManagementUtil.getSessionState(request);
         if (sessionState != null) {
-            Set<String> sessionParticipants = getSessionParticipants(sessionState);
+            Set<String> sessionParticipants = OIDCSessionManagementUtil.getSessionParticipants(sessionState);
             if (!sessionParticipants.isEmpty()) {
                 for (String clientID : sessionParticipants) {
-                    OAuthAppDO oAuthAppDO = getOAuthAppDO(clientID);
+                    OAuthAppDO oAuthAppDO = OIDCSessionManagementUtil.getOAuthAppDO(clientID);
                     String backChannelLogoutUrl = oAuthAppDO.getBackChannelLogoutUrl();
 
-                    if (StringUtils.equals(clientID, getClientId(request))) {
+                    if (StringUtils.equals(clientID, OIDCSessionManagementUtil.getClientId(request))) {
                         // No need to send logut token if the client id of the RP initiated logout is known.
                         continue;
                     }
                     if (StringUtils.isNotBlank(backChannelLogoutUrl)) {
                         // Send back-channel logout request to all RPs those registered their back-channel logout uri.
 
-                        JWTClaimsSet jwtClaimsSet = buildJwtToken(sessionState, getTenanatDomain(oAuthAppDO), clientID);
+                        JWTClaimsSet jwtClaimsSet = buildJwtToken(sessionState, OIDCSessionManagementUtil.getTenantDomain(oAuthAppDO), clientID);
                         String logoutToken =
-                                OAuth2Util.signJWT(jwtClaimsSet, signatureAlgorithm, getSigningTenantDomain(oAuthAppDO))
+                                OAuth2Util.signJWT(jwtClaimsSet, signatureAlgorithm, OIDCSessionManagementUtil.getSigningTenantDomain(oAuthAppDO))
                                         .serialize();
                         logoutTokenList.put(logoutToken, backChannelLogoutUrl);
 
@@ -127,12 +125,12 @@ public class DefaultLogoutTokenBuilder implements LogoutTokenBuilder {
 
         String sub = sessionState.getAuthenticatedUser();
         String jti = UUID.randomUUID().toString();
-        String iss = getIssuer(tenantDomain);
-        List<String> audience = getAudience(clientID);
+        String iss = OIDCSessionManagementUtil.getIssuer(tenantDomain);
+        List<String> audience = OIDCSessionManagementUtil.getAudience(clientID);
         long logoutTokenValidityInMillis = getLogoutTokenExpiryInMillis();
         long currentTimeInMillis = Calendar.getInstance().getTimeInMillis();
         Date iat = new Date(currentTimeInMillis);
-        String sid = getSidClaim(sessionState);
+        String sid = OIDCSessionManagementUtil.getSidClaim(sessionState);
         JSONObject event = new JSONObject().put("http://schemas.openidnet/event/backchannel-logout",
                 new JSONObject());
 
@@ -150,169 +148,6 @@ public class DefaultLogoutTokenBuilder implements LogoutTokenBuilder {
     }
 
     /**
-     * Returns client id from servlet request.
-     * @param request
-     * @return
-     * @throws IdentityOAuth2Exception
-     * @throws InvalidOAuthClientException
-     */
-    private String getClientId(HttpServletRequest request)
-            throws IdentityOAuth2Exception, InvalidOAuthClientException {
-
-        String clientId;
-        String idToken = getIdToken(request);
-        if (idToken != null) {
-            clientId = getClientIdFromIDTokenHint(idToken);
-        } else {
-            log.debug("IdTokenHint is not found in the request ");
-            return null;
-        }
-        if (validateIdTokenHint(clientId, idToken)) {
-            return clientId;
-        } else {
-            log.debug("Id Token is not valid");
-            return null;
-        }
-    }
-
-    /**
-     * Returns signing tenant domain.
-     *
-     * @param oAuthAppDO
-     * @return
-     */
-    private String getSigningTenantDomain(OAuthAppDO oAuthAppDO) {
-
-        boolean isJWTSignedWithSPKey = OAuthServerConfiguration.getInstance().isJWTSignedWithSPKey();
-        String signingTenantDomain;
-
-        if (isJWTSignedWithSPKey) {
-            // Tenant domain of the SP.
-            signingTenantDomain = getTenanatDomain(oAuthAppDO);
-        } else {
-            // Tenant domain of the user.
-            signingTenantDomain = oAuthAppDO.getUser().getTenantDomain();
-        }
-        return signingTenantDomain;
-    }
-
-
-    /**
-     * Returns the OIDCsessionState of the obps cookie
-     *
-     * @param request
-     * @return
-     */
-    private OIDCSessionState getSessionState(HttpServletRequest request) {
-
-        Cookie opbsCookie = OIDCSessionManagementUtil.getOPBrowserStateCookie(request);
-        if (opbsCookie !=null) {
-        String obpsCookieValue = opbsCookie.getValue();
-            OIDCSessionState sessionState = OIDCSessionManagementUtil.getSessionManager()
-                    .getOIDCSessionState(obpsCookieValue);
-            return sessionState;
-        }else {
-            return null;
-        }
-    }
-
-    /**
-     * Return client id of all the RPs belong to same session.
-     *
-     * @param sessionState
-     * @return client id of all the RPs belong to same session
-     */
-    private Set<String> getSessionParticipants(OIDCSessionState sessionState) {
-
-        Set<String> sessionParticipants = sessionState.getSessionParticipants();
-        return sessionParticipants;
-    }
-
-    /**
-     * Returns the sid of the all the RPs belong to same session.
-     *
-     * @param sessionState
-     * @return
-     */
-    private String getSidClaim(OIDCSessionState sessionState) {
-
-        String sidClaim = sessionState.getSidClaim();
-        return sidClaim;
-    }
-
-    private IdentityProvider getResidentIdp(String tenantDomain) throws IdentityOAuth2Exception {
-
-        try {
-            return IdentityProviderManager.getInstance().getResidentIdP(tenantDomain);
-        } catch (IdentityProviderManagementException e) {
-            String errorMsg = String.format(ERROR_GET_RESIDENT_IDP, tenantDomain);
-            throw new IdentityOAuth2Exception(errorMsg, e);
-        }
-    }
-
-    /**
-     * Returning issuer of the tenant domain.
-     *
-     * @param tenantDomain
-     * @return issuer
-     * @throws IdentityOAuth2Exception
-     */
-    private String getIssuer(String tenantDomain) throws IdentityOAuth2Exception {
-
-        IdentityProvider identityProvider = getResidentIdp(tenantDomain);
-        FederatedAuthenticatorConfig[] fedAuthnConfigs =
-                identityProvider.getFederatedAuthenticatorConfigs();
-        // Get OIDC authenticator.
-        FederatedAuthenticatorConfig oidcAuthenticatorConfig =
-                IdentityApplicationManagementUtil.getFederatedAuthenticator(fedAuthnConfigs,
-                        IdentityApplicationConstants.Authenticator.OIDC.NAME);
-        // Setting issuer.
-        String issuer =
-                IdentityApplicationManagementUtil.getProperty(oidcAuthenticatorConfig.getProperties(),
-                        OPENID_IDP_ENTITY_ID).getValue();
-        return issuer;
-    }
-
-    /**
-     * Returns OAuthAppDo using clientID
-     *
-     * @param clientID
-     * @return
-     * @throws IdentityOAuth2Exception
-     * @throws InvalidOAuthClientException
-     */
-    private OAuthAppDO getOAuthAppDO(String clientID) throws IdentityOAuth2Exception, InvalidOAuthClientException {
-
-        OAuthAppDO oAuthAppDO = OAuth2Util.getAppInformationByClientId(clientID);
-        return oAuthAppDO;
-    }
-
-    /**
-     * Returns tenant domain.
-     *
-     * @param oAuthAppDO
-     * @return
-     */
-    private String getTenanatDomain(OAuthAppDO oAuthAppDO) {
-
-        String tenantDomain = OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO);
-        return tenantDomain;
-    }
-
-    /**
-     * Returns a list of audience
-     *
-     * @param clientID
-     * @return
-     */
-    private List<String> getAudience(String clientID) {
-
-        ArrayList<String> audience = new ArrayList<String>();
-        audience.add(clientID);
-        return audience;
-    }
-
-    /**
      * Returns Logout Token Expiration time.
      *
      * @return
@@ -321,93 +156,6 @@ public class DefaultLogoutTokenBuilder implements LogoutTokenBuilder {
 
         return Integer.parseInt(config.getOpenIDConnectBCLogoutTokenExpiration()) *
                 1000L;
-    }
-
-    /**
-     * Returns ID Token
-     *
-     * @param request
-     * @return
-     */
-    private String getIdToken(HttpServletRequest request) {
-
-        String idTokenHint = request.getParameter(OIDCSessionConstants.OIDC_ID_TOKEN_HINT_PARAM);
-        if (idTokenHint != null) {
-            return idTokenHint;
-        }
-        return null;
-    }
-
-    /**
-     * Returns client ID from ID Token Hint.
-     *
-     * @param idTokenHint
-     * @return
-     */
-    private String getClientIdFromIDTokenHint(String idTokenHint) {
-
-        String clientId = null;
-        if (StringUtils.isNotBlank(idTokenHint)) {
-            try {
-                clientId = extractClientFromIdToken(idTokenHint);
-            } catch (ParseException e) {
-                log.error("Error while decoding the ID Token Hint.", e);
-            }
-        }
-        return clientId;
-    }
-
-    /**
-     * Extract client Id from ID Token Hint.
-     * @param idToken
-     * @return
-     * @throws ParseException
-     */
-    private String extractClientFromIdToken(String idToken) throws ParseException {
-
-        return SignedJWT.parse(idToken).getJWTClaimsSet().getAudience().get(0);
-    }
-
-    /**
-     * Validate Id Token Hint.
-     * @param clientId
-     * @param idToken
-     * @return
-     * @throws IdentityOAuth2Exception
-     * @throws InvalidOAuthClientException
-     */
-    private Boolean validateIdTokenHint(String clientId, String idToken) throws IdentityOAuth2Exception,
-            InvalidOAuthClientException {
-
-        String tenantDomain = getSigningTenantDomain(getOAuthAppDO(clientId));
-        if (StringUtils.isEmpty(tenantDomain)) {
-            return false;
-        }
-        int tenantId = IdentityTenantUtil.getTenantId(tenantDomain);
-        RSAPublicKey publicKey;
-
-        try {
-            KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(tenantId);
-
-            if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-                String ksName = tenantDomain.trim().replace(".", "-");
-                String jksName = ksName + ".jks";
-                publicKey = (RSAPublicKey) keyStoreManager.getKeyStore(jksName).getCertificate(tenantDomain)
-                        .getPublicKey();
-            } else {
-                publicKey = (RSAPublicKey) keyStoreManager.getDefaultPublicKey();
-            }
-            SignedJWT signedJWT = SignedJWT.parse(idToken);
-            JWSVerifier verifier = new RSASSAVerifier(publicKey);
-
-            return signedJWT.verify(verifier);
-        } catch (JOSEException | ParseException e) {
-            log.error("Error occurred while validating id token signature.", e);
-            return false;
-        } catch (Exception e) {
-            log.error("Error occurred while validating id token signature.", e);
-            return false;
-        }
     }
 
 }
