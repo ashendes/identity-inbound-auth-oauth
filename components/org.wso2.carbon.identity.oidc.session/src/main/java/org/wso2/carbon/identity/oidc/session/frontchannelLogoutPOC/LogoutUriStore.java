@@ -22,12 +22,12 @@ public class LogoutUriStore {
         logoutUriList.put(clientId,frontchannelLogoutUrl);
     }
 
-    public Map<String, String> getLogoutUriList(){
-        return logoutUriList;
+    public String getFrontchannelLogoutURL(String clientId){
+        return logoutUriList.get(clientId);
     }
 
-    public void clearUriList(){
-        logoutUriList.clear();
+    public void removeFrontChannelLogoutURL(String clientId){
+        logoutUriList.remove(clientId);
     }
 
 }
