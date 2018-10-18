@@ -255,6 +255,7 @@
                         $(jQuery('#applicationAccessTokenPlain').show());
                         $(jQuery('#refreshTokenPlain').show());
                         $(jQuery('#bclogout_row').show());
+                        $(jQuery('#frontchannelLogout_row').show());
                         $(jQuery("#audience_enable").show());
                         $(jQuery("#add_audience").show());
                         $(jQuery("#audience_table").show());
@@ -294,6 +295,10 @@
 
                 function toggleBackchannelLogout(chkbx) {
                     document.addAppform.backChannelLogoutUrl.disabled = !chkbx.checked;
+                }
+
+                function toggleFrontchannelLogout(chkbx) {
+                    document.addAppform.frontchannelLogoutUrl.disabled = !chkbx.checked;
                 }
 
                 function addAudienceFunc() {
@@ -653,6 +658,27 @@
                                         <input class="text-box-big" id="backChannelLogoutUrl"
                                                name="backChannelLogoutUrl" type="text" white-list-patterns="https-url"
                                                disabled="disabled"/>
+                                    </td>
+                                </tr>
+
+                                <tr id="frontchannellogout_enable">
+                                    <td colspan="2">
+                                        <label title="Enable OIDC Frontchannel Logout. Add the Frontchannel Logout Endpoint URL in the textbox below">
+                                            <input type="checkbox" name="enableFrontchannelLogout"
+                                                   id="enableFrontchannelLogout" value="true"
+                                                   onclick="toggleFrontchannelLogout(this)"/>
+                                            <fmt:message key="enable.frontchannel.logout"/>
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr id="frontchannelLogout_row">
+                                    <td class="leftCol-med" style="padding-left: 40px ! important;">
+                                        <fmt:message key="frontchannellogout"/>
+                                    </td>
+                                    <td>
+                                        <input class="text-box-big" id="frontchannelLogoutUrl"
+                                        name="frontchannelLogoutUrl" type="text" white-list-patterns="https-url"
+                                        disabled="disabled"/>
                                     </td>
                                 </tr>
 

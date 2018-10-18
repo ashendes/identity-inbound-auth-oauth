@@ -792,6 +792,28 @@
                                     </td>
                                 </tr>
 
+                                <tr id="frontchannellogout_enable">
+                                    <td colspan="2">
+                                        <label title="Enable OIDC Frontchannel Logout. Add the Frontchannel Logout Endpoint URL in the textbox below">
+                                            <input type="checkbox" name="enableFrontchannelLogout"
+                                                   id="enableFrontchannelLogout" value="true"
+                                                   onclick="toggleFrontchannelLogout(this)"/>
+                                            />
+                                            <fmt:message key="enable.frontchannel.logout"/>
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr id="frontchannelLogout_row">
+                                    <td class="leftCol-med" style="padding-left: 40px ! important;">
+                                        <fmt:message key="frontchannellogout"/>
+                                    </td>
+                                    <td>
+                                        <input class="text-box-big" id="frontchannelLogoutUrl"
+                                               name="frontchannelLogoutUrl" type="text" white-list-patterns="https-url"
+                                               disabled="disabled"/>
+                                    </td>
+                                </tr>
+
                                 <%--Scope validators--%>
                                 <tr id="scope_validator_row" name="scope_validator_row">
                                     <td class="leftCol-med"><fmt:message key='scopeValidators'/></td>
