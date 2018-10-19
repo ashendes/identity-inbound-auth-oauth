@@ -52,19 +52,17 @@ import org.wso2.carbon.identity.oidc.session.backChannelLogout.LogoutRequestSend
 import org.wso2.carbon.identity.oidc.session.cache.OIDCSessionDataCache;
 import org.wso2.carbon.identity.oidc.session.cache.OIDCSessionDataCacheEntry;
 import org.wso2.carbon.identity.oidc.session.cache.OIDCSessionDataCacheKey;
+import org.wso2.carbon.identity.oidc.session.frontchannelLogoutPOC.FrontchannelLogoutResponseGenerator;
 import org.wso2.carbon.identity.oidc.session.handler.OIDCLogoutHandler;
 import org.wso2.carbon.identity.oidc.session.internal.OIDCSessionManagementComponentServiceHolder;
 import org.wso2.carbon.identity.oidc.session.util.OIDCSessionManagementUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -111,7 +109,7 @@ public class OIDCLogoutServlet extends HttpServlet {
          * todo: id_token_hint value
          */
 
-        String redirectURL;
+        /*String redirectURL;
         Cookie opBrowserStateCookie = OIDCSessionManagementUtil.getOPBrowserStateCookie(request);
 
         if (opBrowserStateCookie == null) {
@@ -177,7 +175,15 @@ public class OIDCLogoutServlet extends HttpServlet {
             }
         }
 
-        response.sendRedirect(getRedirectURL(redirectURL, request));
+        response.sendRedirect(getRedirectURL(redirectURL, request));*/
+        response.setContentType("text/html; charset=UTF-8");
+        List<String> URLs = new ArrayList<>();
+        URLs.add("https://openid.net/specs/openid-connect-backchannel-1_0.html#LogoutToken");
+        URLs.add("https://openid.net/specs/openid-connect-session-1_0.html#RPLogout");
+        URLs.add("https://openid.net/specs/openid-connect-frontchannel-1_0.html");
+        PrintWriter out = response.getWriter();
+        FrontchannelLogoutResponseGenerator.iframeGenerator(request, response, URLs, out);
+        out.close();
     }
 
     /**
@@ -185,7 +191,7 @@ public class OIDCLogoutServlet extends HttpServlet {
      * Validate Id token
      * Add OIDC parameters to cache
      *
-     * @param request Http servlet request
+     * @param request  Http servlet request
      * @param response Http servlet response
      * @return Redirect URI
      * @throws IOException
@@ -253,6 +259,7 @@ public class OIDCLogoutServlet extends HttpServlet {
 
     /**
      * Validate Id token signature
+     *
      * @param idToken Id token
      * @return validation state
      */
@@ -293,6 +300,7 @@ public class OIDCLogoutServlet extends HttpServlet {
      * Get tenant domain for signature validation.
      * There is a problem If Id token signed using SP's tenant and there is no direct way to get the tenant domain
      * using client id. So have iterate all the Tenants until get the right client id.
+     *
      * @param idToken id token
      * @return Tenant domain
      */
@@ -322,7 +330,8 @@ public class OIDCLogoutServlet extends HttpServlet {
 
     /**
      * Send request to consent URI
-     * @param request Http servlet request
+     *
+     * @param request  Http servlet request
      * @param response Http servlet response
      * @throws IOException
      */
@@ -351,8 +360,9 @@ public class OIDCLogoutServlet extends HttpServlet {
 
     /**
      * Append state query parameter
+     *
      * @param redirectURL redirect URL
-     * @param stateParam state query parameter
+     * @param stateParam  state query parameter
      * @return Redirect URL after appending state query param if exist
      */
     private String appendStateQueryParam(String redirectURL, String stateParam) {
@@ -365,7 +375,8 @@ public class OIDCLogoutServlet extends HttpServlet {
 
     /**
      * Validate post logout URI with registered callback URI
-     * @param postLogoutUri Post logout redirect URI
+     *
+     * @param postLogoutUri         Post logout redirect URI
      * @param registeredCallbackUri registered callback URI
      * @return Validation state
      */
@@ -392,6 +403,7 @@ public class OIDCLogoutServlet extends HttpServlet {
 
     /**
      * Extract Client Id from Id token
+     *
      * @param idToken id token
      * @return Client Id
      * @throws ParseException
@@ -412,6 +424,7 @@ public class OIDCLogoutServlet extends HttpServlet {
 
     /**
      * Extract Subject from id token
+     *
      * @param idToken id token
      * @return Authenticated Subject
      * @throws ParseException
@@ -447,9 +460,9 @@ public class OIDCLogoutServlet extends HttpServlet {
         //Add all parameters to authentication context before sending to authentication framework
         AuthenticationRequest authenticationRequest = new AuthenticationRequest();
         Map<String, String[]> map = new HashMap<>();
-        map.put(OIDCSessionConstants.OIDC_SESSION_DATA_KEY_PARAM, new String[] { sessionDataKey });
+        map.put(OIDCSessionConstants.OIDC_SESSION_DATA_KEY_PARAM, new String[]{sessionDataKey});
         authenticationRequest.setRequestQueryParams(map);
-        authenticationRequest.addRequestQueryParam(FrameworkConstants.RequestParams.LOGOUT, new String[] { "true" });
+        authenticationRequest.addRequestQueryParam(FrameworkConstants.RequestParams.LOGOUT, new String[]{"true"});
         authenticationRequest.setCommonAuthCallerPath(request.getRequestURI());
         authenticationRequest.setPost(true);
 
@@ -479,7 +492,6 @@ public class OIDCLogoutServlet extends HttpServlet {
         String sessionDataKey = request.getParameter(FrameworkConstants.SESSION_DATA_KEY);
         OIDCSessionDataCacheEntry cacheEntry = getSessionDataFromCache(sessionDataKey);
 
-
         if (cacheEntry != null) {
             if (log.isDebugEnabled()) {
                 String clientId = cacheEntry.getParamMap().get(OIDCSessionConstants.OIDC_CACHE_CLIENT_ID_PARAM);
@@ -495,6 +507,7 @@ public class OIDCLogoutServlet extends HttpServlet {
                     log.debug("Logout request received for sid: " + sidClaim);
                 }
             }
+
             // BackChannel logout request.
             doBackChannelLogout(request);
             String redirectURL = cacheEntry.getPostLogoutRedirectUri();
@@ -536,7 +549,7 @@ public class OIDCLogoutServlet extends HttpServlet {
     }
 
     private void triggerLogoutHandlersForPreLogout(HttpServletRequest request,
-                                                    HttpServletResponse response) throws OIDCSessionManagementException {
+                                                   HttpServletResponse response) throws OIDCSessionManagementException {
 
         List<OIDCLogoutHandler> oidcLogoutHandlers =
                 OIDCSessionManagementComponentServiceHolder.getOIDCLogoutHandlers();
@@ -620,6 +633,10 @@ public class OIDCLogoutServlet extends HttpServlet {
         if (log.isDebugEnabled()) {
             log.debug("Sending backchannel logout request.");
         }
+    }
+
+    private void doFrontchannelLogout(HttpServletRequest request) {
+
     }
 
     private void setSPAttributeToRequest(HttpServletRequest req, String spName, String tenantDomain) {
