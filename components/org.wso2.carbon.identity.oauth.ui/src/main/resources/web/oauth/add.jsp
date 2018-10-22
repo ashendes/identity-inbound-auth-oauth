@@ -145,6 +145,7 @@
                 function validate() {
                     var callbackUrl = document.getElementById('callback').value;
                     var backChannelLogoutUrl = document.getElementById('backChannelLogoutUrl').value;
+                    var frontchannelLogoutUrl = document.getElementById('frontchannelLogoutUrl').value;
                     var userTokenExpiryTime = document.getElementById("userAccessTokenExpiryTime").value;
                     var applicationTokenExpiryTime = document.getElementById("userAccessTokenExpiryTime").value;
                     var refreshTokenExpiryTime = document.getElementById("refreshTokenExpiryTime").value;
@@ -155,6 +156,11 @@
                     }
                     if (backChannelLogoutUrl.indexOf("#") !== -1) {
                         CARBON.showWarningDialog('<fmt:message key="backchannel.logout.is.fragment"/>');
+                        return false;
+                    }
+
+                    if (frontchannelLogoutUrl.indexOf("#") !== -1) {
+                        CARBON.showWarningDialog('<fmt:message key="frontchannel.logout.is.fragment"/>');
                         return false;
                     }
 
@@ -169,6 +175,11 @@
                         if (!isWhiteListed(backChannelLogoutUrl, ["url"]) || !isNotBlackListed(backChannelLogoutUrl,
                                 ["uri-unsafe-exists"])) {
                             CARBON.showWarningDialog('<fmt:message key="backchannel.logout.is.not.url"/>');
+                            return false;
+                        }
+                        if (!isWhiteListed(frontchannelLogoutUrl, ["url"]) || !isNotBlackListed(frontchannelLogoutUrl,
+                            ["uri-unsafe-exists"])) {
+                            CARBON.showWarningDialog('<fmt:message key="frontchannel.logout.is.not.url"/>');
                             return false;
                         }
                     }
@@ -235,7 +246,10 @@
                         $(jQuery('#userAccessTokenPlain').hide());
                         $(jQuery('#applicationAccessTokenPlain').hide());
                         $(jQuery('#refreshTokenPlain').hide());
+                        $(jQuery('#bclogout_enable').hide());
                         $(jQuery('#bclogout_row').hide());
+                        $(jQuery('#frontchannellogout_enable').hide());
+                        $(jQuery('#frontchannelLogout_row').hide());
                         $(jQuery("#audience_enable").hide());
                         $(jQuery("#add_audience").hide());
                         $(jQuery("#audience_table").hide());
@@ -254,8 +268,6 @@
                         $(jQuery('#userAccessTokenPlain').show());
                         $(jQuery('#applicationAccessTokenPlain').show());
                         $(jQuery('#refreshTokenPlain').show());
-                        $(jQuery('#bclogout_row').show());
-                        $(jQuery('#frontchannelLogout_row').show());
                         $(jQuery("#audience_enable").show());
                         $(jQuery("#add_audience").show());
                         $(jQuery("#audience_table").show());
@@ -267,8 +279,16 @@
 
                         if (!supportGrantCode && !supportImplicit) {
                             $(jQuery('#callback_row')).hide();
+                            $(jQuery('#bclogout_enable').hide());
+                            $(jQuery('#bclogout_row').hide());
+                            $(jQuery('#frontchannellogout_enable').hide());
+                            $(jQuery('#frontchannelLogout_row').hide());
                         } else {
                             $(jQuery('#callback_row')).show();
+                            $(jQuery('#bclogout_enable').show());
+                            $(jQuery('#bclogout_row').show());
+                            $(jQuery('#frontchannellogout_enable').show());
+                            $(jQuery('#frontchannelLogout_row').show());
                         }
                         if (supportGrantCode) {
                             $(jQuery("#pkce_enable").show());
