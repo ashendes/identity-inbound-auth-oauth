@@ -128,6 +128,9 @@
             if (app.getBackChannelLogoutUrl() == null) {
                 app.setBackChannelLogoutUrl("");
             }
+            if (app.getFrontchannelLogoutUrl() == null) {
+                app.setFrontchannelLogoutUrl("");
+            }
             allowedGrants = new ArrayList<String>(Arrays.asList(client.getAllowedOAuthGrantTypes()));
             allowedScopeValidators = new ArrayList<String>(Arrays.asList(client.getAllowedScopeValidators()));
             // Sorting the list to display the scope validators in alphabetical order
@@ -346,6 +349,10 @@
 
                 function toggleBackchannelLogout(chkbx) {
                     document.editAppform.backChannelLogoutUrl.disabled = !chkbx.checked;
+                }
+
+                function toggleFrontchannelLogout(chkbx) {
+                    document.editAppform.frontchannelLogoutUrl.disabled = !chkbx.checked;
                 }
 
 
@@ -797,7 +804,8 @@
                                         <label title="Enable OIDC Frontchannel Logout. Add the Frontchannel Logout Endpoint URL in the textbox below">
                                             <input type="checkbox" name="enableFrontchannelLogout"
                                                    id="enableFrontchannelLogout" value="true"
-                                                   onclick="toggleFrontchannelLogout(this)"/>
+                                                   onclick="toggleFrontchannelLogout(this)"
+                                                    <%= (app.getFrontchannelLogoutUrl() != "" ? "checked" : "")%>
                                             />
                                             <fmt:message key="enable.frontchannel.logout"/>
                                         </label>
@@ -810,7 +818,9 @@
                                     <td>
                                         <input class="text-box-big" id="frontchannelLogoutUrl"
                                                name="frontchannelLogoutUrl" type="text" white-list-patterns="https-url"
-                                               disabled="disabled"/>
+                                               value="<%= Encode.forHtmlAttribute((app.getFrontchannelLogoutUrl()))%>"
+                                                <%= (app.getFrontchannelLogoutUrl() == "" ? "disabled" : "")%>
+                                        />
                                     </td>
                                 </tr>
 

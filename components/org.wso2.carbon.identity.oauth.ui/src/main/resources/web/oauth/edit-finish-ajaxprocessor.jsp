@@ -83,8 +83,11 @@
     String idTokenEncryptionAlgorithm = request.getParameter("idTokenEncryptionAlgorithm");
     String idTokenEncryptionMethod = request.getParameter("idTokenEncryptionMethod");
 
-    boolean isBackChannelLogoutEnabled = Boolean.parseBoolean(request.getParameter(("enableBackchannelLogout")));
+    boolean isBackChannelLogoutEnabled = Boolean.parseBoolean(request.getParameter("enableBackchannelLogout"));
     String backchannelLogoutUrl = request.getParameter("backChannelLogoutUrl");
+
+    boolean isFrontchannelLogoutEnabled = Boolean.parseBoolean(request.getParameter("enableFrontchannelLogout"));
+    String frontchannelLogoutUrl = request.getParameter("frontchannelLogoutUrl");
     
     String forwardTo = "index.jsp";
     String BUNDLE = "org.wso2.carbon.identity.oauth.ui.i18n.Resources";
@@ -158,6 +161,10 @@
 
             if (isBackChannelLogoutEnabled) {
                 app.setBackChannelLogoutUrl(backchannelLogoutUrl);
+            }
+
+            if (isFrontchannelLogoutEnabled) {
+                app.setFrontchannelLogoutUrl(frontchannelLogoutUrl);
             }
             
             client.updateOAuthApplicationData(app);

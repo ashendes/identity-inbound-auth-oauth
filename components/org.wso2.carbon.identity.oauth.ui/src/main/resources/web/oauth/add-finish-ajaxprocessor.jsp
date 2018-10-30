@@ -57,6 +57,7 @@
     String refreshTokenExpiryTime = request.getParameter("refreshTokenExpiryTime");
     String idTokenExpiryTime = request.getParameter("idTokenExpiryTime");
     String backchannelLogoutUrl = request.getParameter("backChannelLogoutUrl");
+    String frontchannelLogoutUrl = request.getParameter("frontchannelLogoutUrl");
     String tokenType = request.getParameter("tokenType");
 
 	boolean pkceMandatory = false;
@@ -110,6 +111,9 @@
 
             if (Boolean.parseBoolean(request.getParameter("enableBackchannelLogout"))) {
                 app.setBackChannelLogoutUrl(backchannelLogoutUrl);
+            }
+            if (Boolean.parseBoolean(request.getParameter("enableFrontchannelLogout"))) {
+                app.setFrontchannelLogoutUrl(frontchannelLogoutUrl);
             }
 
             String grants;
