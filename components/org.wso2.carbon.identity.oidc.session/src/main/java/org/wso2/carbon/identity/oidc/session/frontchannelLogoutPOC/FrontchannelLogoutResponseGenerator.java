@@ -9,11 +9,12 @@ import java.util.List;
 public class FrontchannelLogoutResponseGenerator {
 
 
-
-    public static void iframeGenerator(HttpServletRequest request, HttpServletResponse response, List<String> frontchannelLogoutURLs, PrintWriter out)
+    public static void iframeGenerator(HttpServletRequest request, HttpServletResponse response, List<String> frontchannelLogoutURLs, String redirectURL, PrintWriter out)
                     throws IOException {
 
-
+        if (redirectURL == null) {
+            redirectURL = "https://www.google.com";
+        }
 //        out.println("<html>");
 //        out.println("<body>");
 //        out.println("<p> "+frontchannelLogoutURL + "</p>");
@@ -32,19 +33,26 @@ public class FrontchannelLogoutResponseGenerator {
                 "}\n" +
                 "};\n" +
                 "function redirect(){\n" +
-                "window.location = \"https://www.google.com\";\n" +
+                "window.location = \"" + redirectURL + "\";\n" +
                 "};\n" +
                 "</script>\n" +
                 "</head>");
         out.println("<body>");
-        for(String frontchannelLogoutURL: frontchannelLogoutURLs){
-            out.println("<iframe \n" +
-                    "\twidth=\"600\"\n" +
-                    "\theight=\"600\"\n" +
-                    "\tstyle=\"border: 5px solid black;\"\t\n" +
-                    "\tsrc=\"" + frontchannelLogoutURL + "\"" +
-                    "onload=\"onIFrameLoad()\">\n"+
-                    "</iframe>");
+        if (!frontchannelLogoutURLs.isEmpty()) {
+            for (String frontchannelLogoutURL : frontchannelLogoutURLs) {
+                out.println("<iframe \n" +
+                        "\twidth=\"600\"\n" +
+                        "\theight=\"600\"\n" +
+                        "\tstyle=\"border: 5px solid black;\"\t\n" +
+                        "\tsrc=\"" + frontchannelLogoutURL + "\"" +
+                        "\tsrcdoc=\"" + frontchannelLogoutURL + "\"" +
+                        "onload=\"onIFrameLoad()\">\n" +
+                        "</iframe>");
+            }
+        } else {
+            out.println("<script>\n" +
+                    "\tredirect();\n" +
+                    "\t</script>");
         }
         out.println("</body>");
         out.println("</html>");

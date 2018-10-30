@@ -109,7 +109,7 @@ public class OIDCLogoutServlet extends HttpServlet {
          * todo: id_token_hint value
          */
 
-        /*String redirectURL;
+        String redirectURL;
         Cookie opBrowserStateCookie = OIDCSessionManagementUtil.getOPBrowserStateCookie(request);
 
         if (opBrowserStateCookie == null) {
@@ -175,15 +175,39 @@ public class OIDCLogoutServlet extends HttpServlet {
             }
         }
 
-        response.sendRedirect(getRedirectURL(redirectURL, request));*/
-        response.setContentType("text/html; charset=UTF-8");
-        List<String> URLs = new ArrayList<>();
-        URLs.add("https://openid.net/specs/openid-connect-backchannel-1_0.html#LogoutToken");
-        URLs.add("https://openid.net/specs/openid-connect-session-1_0.html#RPLogout");
-        URLs.add("https://openid.net/specs/openid-connect-frontchannel-1_0.html");
-        PrintWriter out = response.getWriter();
-        FrontchannelLogoutResponseGenerator.iframeGenerator(request, response, URLs, out);
-        out.close();
+        //response.sendRedirect(getRedirectURL(redirectURL, request));
+    }
+
+    private Map<String, List<String>> getFrontchannelLogoutURLs(HttpServletRequest request) {
+
+        Map<String, List<String>> URLs = new HashMap<>();
+        List<String> frontchannelLogoutURLs = new ArrayList<>();
+        OIDCSessionState sessionState = OIDCSessionManagementUtil.getSessionState(request);
+        if (sessionState != null) {
+            Set<String> sessionParticipants = OIDCSessionManagementUtil.getSessionParticipants(sessionState);
+            if (!sessionParticipants.isEmpty()) {
+                OAuthAppDO oAuthAppDO = null;
+
+                try {
+                    URLs.put("callbackURL", new ArrayList<>(Arrays.asList("http://localhost.com:8080/playgroundN2/oauth2client")));
+                    String currentClient = OIDCSessionManagementUtil.getClientId(request);
+                    for (String clientID : sessionParticipants) {
+                        oAuthAppDO = OIDCSessionManagementUtil.getOAuthAppDO(clientID);
+                        if (StringUtils.equals(clientID, currentClient)) {
+                            List<String> callbackURL = new ArrayList<>(Arrays.asList(oAuthAppDO.getCallbackUrl()));
+                            URLs.put("callbackURL", callbackURL);
+                            continue;
+                        }
+                        String frontchannelLogoutURL = oAuthAppDO.getFrontchannelLogoutUrl();
+                        frontchannelLogoutURLs.add(frontchannelLogoutURL);
+                    }
+                } catch (IdentityOAuth2Exception | InvalidOAuthClientException e) {
+                    log.error("Error while getting Frontchannel Logout URLs");
+                }
+            }
+        }
+        URLs.put("frontchannelLogoutURLs", frontchannelLogoutURLs);
+        return URLs;
     }
 
     /**
@@ -507,7 +531,8 @@ public class OIDCLogoutServlet extends HttpServlet {
                     log.debug("Logout request received for sid: " + sidClaim);
                 }
             }
-
+            doFrontchannelLogout(request, response);
+            /*
             // BackChannel logout request.
             doBackChannelLogout(request);
             String redirectURL = cacheEntry.getPostLogoutRedirectUri();
@@ -531,6 +556,7 @@ public class OIDCLogoutServlet extends HttpServlet {
             Cookie opBrowserStateCookie = OIDCSessionManagementUtil.removeOPBrowserStateCookie(request, response);
             OIDCSessionManagementUtil.getSessionManager().removeOIDCSessionState(opBrowserStateCookie.getValue());
             response.sendRedirect(getRedirectURL(redirectURL, request));
+            */
         } else {
             response.sendRedirect(getRedirectURL(OIDCSessionManagementUtil.getErrorPageURL(OAuth2ErrorCodes
                     .SERVER_ERROR, "User logout failed"), request));
@@ -635,8 +661,17 @@ public class OIDCLogoutServlet extends HttpServlet {
         }
     }
 
-    private void doFrontchannelLogout(HttpServletRequest request) {
+    private void doFrontchannelLogout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+//        String postLogoutRedirectURL = request.getParameter(OIDCSessionConstants.OIDC_POST_LOGOUT_REDIRECT_URI_PARAM);
 
+        response.setContentType("text/html; charset=UTF-8");
+        Map<String, List<String>> URLs = getFrontchannelLogoutURLs(request);
+//        URLs.add("https://openid.net/specs/openid-connect-backchannel-1_0.html#LogoutToken");
+//        URLs.add("https://openid.net/specs/openid-connect-session-1_0.html#RPLogout");
+//        URLs.add("https://openid.net/specs/openid-connect-frontchannel-1_0.html");
+        PrintWriter out = response.getWriter();
+        FrontchannelLogoutResponseGenerator.iframeGenerator(request, response, URLs.get("frontchannelLogoutURLs"), URLs.get("callbackURL").get(0), out);
+        out.close();
     }
 
     private void setSPAttributeToRequest(HttpServletRequest req, String spName, String tenantDomain) {
