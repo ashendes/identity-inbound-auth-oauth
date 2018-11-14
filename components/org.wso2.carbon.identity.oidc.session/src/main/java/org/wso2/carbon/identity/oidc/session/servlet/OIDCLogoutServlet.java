@@ -189,7 +189,7 @@ public class OIDCLogoutServlet extends HttpServlet {
                 OAuthAppDO oAuthAppDO = null;
 
                 try {
-                    URLs.put("callbackURL", new ArrayList<>(Arrays.asList("http://localhost.com:8080/playgroundN2/oauth2client")));
+                    URLs.put("callbackURL", new ArrayList<>(Arrays.asList("https://localhost.com:8443/playgroundN2/oauth2client")));
                     String currentClient = OIDCSessionManagementUtil.getClientId(request);
                     for (String clientID : sessionParticipants) {
                         oAuthAppDO = OIDCSessionManagementUtil.getOAuthAppDO(clientID);

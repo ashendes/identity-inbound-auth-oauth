@@ -41,11 +41,11 @@ public class FrontchannelLogoutResponseGenerator {
         if (!frontchannelLogoutURLs.isEmpty()) {
             for (String frontchannelLogoutURL : frontchannelLogoutURLs) {
                 out.println("<iframe \n" +
-                        "\twidth=\"600\"\n" +
-                        "\theight=\"600\"\n" +
+                        "\twidth=\"400\"\n" +
+                        "\theight=\"100\"\n" +
                         "\tstyle=\"border: 5px solid black;\"\t\n" +
                         "\tsrc=\"" + frontchannelLogoutURL + "\"" +
-                        "\tsrcdoc=\"" + frontchannelLogoutURL + "\"" +
+//                        "\tsrcdoc=\"" + frontchannelLogoutURL + "\"" +
                         "onload=\"onIFrameLoad()\">\n" +
                         "</iframe>");
             }
