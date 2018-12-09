@@ -291,4 +291,34 @@ public class DiscoveryConstants {
      * OP.
      */
     public static final String END_SESSION_ENDPOINT = "end_session_endpoint";
+
+    /**
+     * frontchannel_logout_supported
+     * OPTIONAL. Boolean value specifying whether the OP supports HTTP-based logout, with true indicating support.
+     * If omitted, the default value is false.
+     */
+    public static final String FRONTCHANNEL_LOGOUT_SUPPORTED = "frontchannel_logout_supported";
+
+    /**
+     * frontchannel_logout_session_supported
+     * OPTIONAL. Boolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query
+     * parameters to identify the RP session with the OP when the frontchannel_logout_uri is used. If supported,
+     * the sid Claim is also included in ID Tokens issued by the OP. If omitted, the default value is false.
+     */
+    public static final String FRONTCHANNEL_LOGOUT_SESSION_SUPPORTED = "frontchannel_logout_session_supported";
+
+    /**
+     * backchannel_logout_supported
+     * OPTIONAL. Boolean value specifying whether the OP supports back-channel logout, with true indicating support.
+     * If omitted, the default value is false.
+     */
+    public static final String BACKCHANNEL_LOGOUT_SUPPORTED = "backchannel_logout_supported";
+
+    /**
+     * backchannel_logout_session_supported
+     * OPTIONAL. Boolean value specifying whether the OP can pass a sid (session ID) Claim in the Logout Token to
+     * identify the RP session with the OP. If supported, the sid Claim is also included in ID Tokens issued by
+     * the OP. If omitted, the default value is false.
+     */
+    public static final String BACKCHANNEL_LOGOUT_SESSION_SUPPORTED = "backchannel_logout_session_supported";
 }

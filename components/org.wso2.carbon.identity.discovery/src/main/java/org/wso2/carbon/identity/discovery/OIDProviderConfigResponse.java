@@ -66,6 +66,10 @@ public class OIDProviderConfigResponse {
     private String opTosUri;
     private String checkSessionIframe;
     private String endSessionEndpoint;
+    private String frontchannelLogoutSupported;
+    private String frontchannelLogoutSessionSupported;
+    private String backchannelLogoutSupported;
+    private String backchannelLogoutSessionSupported;
 
 
     public String getIssuer() {
@@ -367,6 +371,39 @@ public class OIDProviderConfigResponse {
         this.endSessionEndpoint = endSessionEndpoint;
     }
 
+    public String getFrontchannelLogoutSupported() {
+        return frontchannelLogoutSupported;
+    }
+
+    public void setFrontchannelLogoutSupported(String frontchannelLogoutSupported) {
+        this.frontchannelLogoutSupported = frontchannelLogoutSupported;
+    }
+
+    public String getFrontchannelLogoutSessionSupported() {
+        return frontchannelLogoutSessionSupported;
+    }
+
+    public void setFrontchannelLogoutSessionSupported(String frontchannelLogoutSessionSupported) {
+        this.frontchannelLogoutSessionSupported = frontchannelLogoutSessionSupported;
+    }
+
+    public String getBackchannelLogoutSupported() {
+        return backchannelLogoutSupported;
+    }
+
+    public void setBackchannelLogoutSupported(String backchannelLogoutSupported) {
+        this.backchannelLogoutSupported = backchannelLogoutSupported;
+    }
+
+    public String getBackchannelLogoutSessionSupported() {
+        return backchannelLogoutSessionSupported;
+    }
+
+    public void setBackchannelLogoutSessionSupported(String backchannelLogoutSessionSupported) {
+        this.backchannelLogoutSessionSupported = backchannelLogoutSessionSupported;
+    }
+
+
     public Map<String, Object> getConfigMap() {
         Map<String, Object> configMap = new HashMap<String, Object>();
         configMap.put(DiscoveryConstants.ISSUER.toLowerCase(), this.issuer);
@@ -419,6 +456,14 @@ public class OIDProviderConfigResponse {
         configMap.put(DiscoveryConstants.END_SESSION_ENDPOINT.toLowerCase(), this.endSessionEndpoint);
         configMap.put(DiscoveryConstants.USERINFO_SIGNING_ALG_VALUES_SUPPORTED.toLowerCase(), this
                 .userinfoSigningAlgValuesSupported);
+        configMap.put(DiscoveryConstants.FRONTCHANNEL_LOGOUT_SUPPORTED.toLowerCase(), this
+                .frontchannelLogoutSupported);
+        configMap.put(DiscoveryConstants.FRONTCHANNEL_LOGOUT_SESSION_SUPPORTED.toLowerCase(), this
+                .frontchannelLogoutSessionSupported);
+        configMap.put(DiscoveryConstants.BACKCHANNEL_LOGOUT_SUPPORTED.toLowerCase(), this
+                .backchannelLogoutSupported);
+        configMap.put(DiscoveryConstants.BACKCHANNEL_LOGOUT_SESSION_SUPPORTED.toLowerCase(), this
+                .backchannelLogoutSessionSupported);
         return configMap;
     }
 

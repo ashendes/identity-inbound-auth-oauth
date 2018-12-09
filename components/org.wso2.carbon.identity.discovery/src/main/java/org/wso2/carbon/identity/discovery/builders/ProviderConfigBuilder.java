@@ -112,6 +112,12 @@ public class ProviderConfigBuilder {
         providerConfig.setRequestObjectSigningAlgValuesSupported(
                 OAuth2Util.getRequestObjectSigningAlgValuesSupported().stream().toArray(String[]::new));
 
+        providerConfig.setFrontchannelLogoutSupported(IdentityConstants.TRUE);
+        // Session not yet supported for Frontchannel logout
+        providerConfig.setFrontchannelLogoutSessionSupported(IdentityConstants.OpenId.FALSE);
+        providerConfig.setBackchannelLogoutSupported(IdentityConstants.TRUE);
+        providerConfig.setBackchannelLogoutSessionSupported(IdentityConstants.TRUE);
+
         return providerConfig;
     }
 }
