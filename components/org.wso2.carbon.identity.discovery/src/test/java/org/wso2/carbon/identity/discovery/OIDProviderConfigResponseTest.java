@@ -335,4 +335,36 @@ public class OIDProviderConfigResponseTest {
         Assert.assertNotNull(map);
     }
 
+    @Test
+    public void testGetandSetFrontchannelLogoutSupported() throws Exception {
+        String frontchannelLogoutSupported = "parameter";
+        oidProviderConfigResponse.setFrontchannelLogoutSupported("parameter");
+        String frontchannelLogoutSupported1 = oidProviderConfigResponse.getFrontchannelLogoutSupported();
+        assertEquals(frontchannelLogoutSupported1, frontchannelLogoutSupported);
+    }
+
+    @Test
+    public void testGetandSetFrontchannelLogoutSessionSupported() throws Exception {
+        String frontchannelLogoutSessionSupported = "parameter";
+        oidProviderConfigResponse.setFrontchannelLogoutSessionSupported("parameter");
+        String frontchannelLogoutSessionSupported1 = oidProviderConfigResponse.getFrontchannelLogoutSessionSupported();
+        assertEquals(frontchannelLogoutSessionSupported1, frontchannelLogoutSessionSupported);
+    }
+
+    @Test
+    public void testGetandSetBackchannelLogoutSupported() throws Exception {
+        String backchannelLogoutSupported = "parameter";
+        oidProviderConfigResponse.setBackchannelLogoutSupported("parameter");
+        String backchannelLogoutSupported1 = oidProviderConfigResponse.getBackchannelLogoutSupported();
+        assertEquals(backchannelLogoutSupported1, backchannelLogoutSupported);
+    }
+
+    @Test
+    public void testGetandSetBackchannelLogoutSessionSupported() throws Exception {
+        String backchannelLogoutSessionSupported = "parameter";
+        oidProviderConfigResponse.setBackchannelLogoutSessionSupported("parameter");
+        String backchannelLogoutSessionSupported1 = oidProviderConfigResponse.getBackchannelLogoutSessionSupported();
+        assertEquals(backchannelLogoutSessionSupported1, backchannelLogoutSessionSupported);
+    }
+
 }
