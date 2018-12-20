@@ -59,6 +59,12 @@ public class RegistrationRequestDTO  {
   private String spTemplateName = null;
 
 
+  private String backchannelLogoutUri = null;
+
+
+  private String frontchannelLogoutUri = null;
+
+
   /**
    **/
   @ApiModelProperty(required = true, value = "")
@@ -224,6 +230,32 @@ public class RegistrationRequestDTO  {
     this.spTemplateName = spTemplateName;
   }
 
+  /**
+   *
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("backchannel_logout_uri")
+  public String getBackchannelLogoutUri() {
+    return backchannelLogoutUri;
+  }
+
+  public void setBackchannelLogoutUri(String backchannelLogoutUri) {
+    this.backchannelLogoutUri = backchannelLogoutUri;
+  }
+
+  /**
+   *
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("frontchannel_logout_uri")
+  public String getFrontchannelLogoutUri() {
+    return frontchannelLogoutUri;
+  }
+
+  public void setFrontchannelLogoutUri(String frontchannelLogoutUri) {
+    this.frontchannelLogoutUri = frontchannelLogoutUri;
+  }
+
   @Override
   public String toString()  {
     StringBuilder sb = new StringBuilder();
@@ -243,6 +275,8 @@ public class RegistrationRequestDTO  {
     sb.append("  response_types: ").append(responseTypes).append("\n");
     sb.append("  token_type_extension: ").append(tokenType).append("\n");
     sb.append("  ext_param_sp_template: ").append(spTemplateName).append("\n");
+    sb.append("  backchannel_logout_uri: ").append(backchannelLogoutUri).append("\n");
+    sb.append("  frontchannel_logout_uri: ").append(frontchannelLogoutUri).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

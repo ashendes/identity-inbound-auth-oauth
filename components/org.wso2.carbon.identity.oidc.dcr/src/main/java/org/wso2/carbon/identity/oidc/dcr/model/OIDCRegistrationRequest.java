@@ -66,5 +66,9 @@ public class OIDCRegistrationRequest extends RegistrationRequest {
         public static final String DEFAULT_ACR_VALUES = "default_acr_values";
         public static final String INITIATE_LOGIN_URI = "initiate_login_uri";
         public static final String REQUEST_URIS = "request_uris";
+        public final static String BACKCHANNEL_LOGOUT_URI = "backchannel_logout_uri";
+        public final static String BACKCHANNEL_LOGOUT_SESSION_REQUIRED = "backchannel_logout_session_required";
+        public final static String FRONTCHANNEL_LOGOUT_URI = "frontchannel_logout_uri";
+        public final static String FRONTCHANNEL_LOGOUT_SESSION_REQUIRED = "frontchannel_logout_session_required";
     }
 }

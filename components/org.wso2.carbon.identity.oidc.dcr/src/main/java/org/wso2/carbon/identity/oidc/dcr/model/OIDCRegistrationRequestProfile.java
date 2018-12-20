@@ -42,6 +42,10 @@ public class OIDCRegistrationRequestProfile extends RegistrationRequestProfile {
     private String defaultAcrValues;
     private String initiateLoginUri;
     private List<String> requestUris = new ArrayList<>();
+    private String backchannelLogoutUri;
+    private String backchannelLogoutSessionRequired;
+    private String frontchannelLogoutUri;
+    private String frontchannelLogoutSessionRequired;
 
     public String getSectorIdentifierUri() {
         return sectorIdentifierUri;
@@ -173,5 +177,37 @@ public class OIDCRegistrationRequestProfile extends RegistrationRequestProfile {
 
     public List<String> getRequestUris() {
         return requestUris;
+    }
+
+    public String getBackchannelLogoutUri() {
+        return backchannelLogoutUri;
+    }
+
+    public void setBackchannelLogoutUri(String backchannelLogoutUri) {
+        this.backchannelLogoutUri = backchannelLogoutUri;
+    }
+
+    public String getFrontchannelLogoutUri() {
+        return frontchannelLogoutUri;
+    }
+
+    public void setFrontchannelLogoutUri(String frontchannelLogoutUri) {
+        this.frontchannelLogoutUri = frontchannelLogoutUri;
+    }
+
+    public String getBackchannelLogoutSessionRequired() {
+        return backchannelLogoutSessionRequired;
+    }
+
+    public void setBackchannelLogoutSessionRequired(String backchannelLogoutSessionRequired) {
+        this.backchannelLogoutSessionRequired = backchannelLogoutSessionRequired;
+    }
+
+    public String getFrontchannelLogoutSessionRequired() {
+        return frontchannelLogoutSessionRequired;
+    }
+
+    public void setFrontchannelLogoutSessionRequired(String frontchannelLogoutSessionRequired) {
+        this.frontchannelLogoutSessionRequired = frontchannelLogoutSessionRequired;
     }
 }

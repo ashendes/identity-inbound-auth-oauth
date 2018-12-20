@@ -139,6 +139,14 @@ public class OIDCRegistrationRequestFactory extends RegistrationRequestFactory {
                     .OIDCRegistrationRequestConstants.DEFAULT_ACR_VALUES));
             oidcRegistrationRequestProfile.setInitiateLoginUri((String) jsonData.get(OIDCRegistrationRequest
                     .OIDCRegistrationRequestConstants.INITIATE_LOGIN_URI));
+            oidcRegistrationRequestProfile.setBackchannelLogoutUri((String) jsonData.get(OIDCRegistrationRequest
+                    .OIDCRegistrationRequestConstants.BACKCHANNEL_LOGOUT_URI));
+            oidcRegistrationRequestProfile.setBackchannelLogoutSessionRequired((String) jsonData
+                    .get(OIDCRegistrationRequest.OIDCRegistrationRequestConstants.BACKCHANNEL_LOGOUT_SESSION_REQUIRED));
+            oidcRegistrationRequestProfile.setFrontchannelLogoutUri((String) jsonData.get(OIDCRegistrationRequest
+                    .OIDCRegistrationRequestConstants.FRONTCHANNEL_LOGOUT_URI));
+            oidcRegistrationRequestProfile.setFrontchannelLogoutSessionRequired((String) jsonData
+                    .get(OIDCRegistrationRequest.OIDCRegistrationRequestConstants.FRONTCHANNEL_LOGOUT_SESSION_REQUIRED));
             Object obj = jsonData.get(OIDCRegistrationRequest.OIDCRegistrationRequestConstants.REQUEST_URIS);
             if (obj instanceof JSONArray) {
                 JSONArray requestURIs = (JSONArray) obj;

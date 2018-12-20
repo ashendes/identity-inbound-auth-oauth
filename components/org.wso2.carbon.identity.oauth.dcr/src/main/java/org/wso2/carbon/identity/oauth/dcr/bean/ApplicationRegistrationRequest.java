@@ -33,6 +33,8 @@ public class ApplicationRegistrationRequest implements Serializable {
     private String consumerKey = null;
     private String consumerSecret = null;
     private String spTemplateName = null;
+    private String backchannelLogoutUri = null;
+    private String frontchannelLogoutUri = null;
 
     public List<String> getRedirectUris() {
         return redirectUris;
@@ -97,5 +99,21 @@ public class ApplicationRegistrationRequest implements Serializable {
      */
     public void setSpTemplateName(String spTemplateName) {
         this.spTemplateName = spTemplateName;
+    }
+
+    public String getBackchannelLogoutUri() {
+        return backchannelLogoutUri;
+    }
+
+    public void setBackchannelLogoutUri(String backchannelLogoutUri) {
+        this.backchannelLogoutUri = backchannelLogoutUri;
+    }
+
+    public String getFrontchannelLogoutUri() {
+        return frontchannelLogoutUri;
+    }
+
+    public void setFrontchannelLogoutUri(String frontchannelLogoutUri) {
+        this.frontchannelLogoutUri = frontchannelLogoutUri;
     }
 }
